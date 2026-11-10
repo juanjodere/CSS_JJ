@@ -1,15 +1,10 @@
+#include "game.h"
 #include "Arco.h"
-
-// Llama al método de la textura que se encarga de dibujarla, en la posición de pos.
-void
-Arco::render() const{
-	texture->renderFrame(pos.to_sdl(), 0, descargado);
-}
 
 // Mueve el rectángulo pos del arco en función de la velocidad, la dirección, y el tiempo desde el último movimiento.
 bool
-Arco::update(int dt) {
-	move(VEL, dir, dt);
+Arco::update(float dt) {
+	move(vel, dir, dt);
 
 	return true;
 }
@@ -20,7 +15,7 @@ void
 Arco::move(Vector2D<float> vel, float dir, int dt) {
 	if (pos.getTopLeftCorner().getY() < 0 && dir == -1)
 		dir = 0;
-	else if (pos.getTopLeftCorner().getY() + pos.getHeight() > game->WINDOW_HEIGHT && dir == 1)
+	else if (pos.getTopLeftCorner().getY() + pos.getHeight() > _game->WINDOW_HEIGHT && dir == 1)
 		dir = 0;
 	else
 	pos.move(vel * dir * dt);
@@ -48,7 +43,7 @@ Arco::handleEvent(const SDL_Event& event) {
 			// Dispara
 			if (!descargado) {
 				descargado = true;
-				game->createArrow({ 2, 39 }, pos.getTopLeftCorner());
+				_game->createArrow({ 2, 39 }, pos.getTopLeftCorner());
 				numFlechas--;
 			}
 		}
@@ -64,7 +59,7 @@ Arco::handleEvent(const SDL_Event& event) {
 		if (flags & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) { // Click izquierdo.
 			if (!descargado) {
 				descargado = true; 
-				game->createArrow({ 2, 39 }, pos.getTopLeftCorner());
+				_game->createArrow({ 2, 39 }, pos.getTopLeftCorner());
 				numFlechas--;
 			}
 		}

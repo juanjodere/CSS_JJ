@@ -22,6 +22,7 @@ using namespace std;
 class Texture;
 class flecha;
 class Arco;
+class Balloon;
 
 
 class Game
@@ -49,7 +50,7 @@ private:
 	std::array<Texture*, NUM_TEXTURES> textures;
 
 	void render() const;
-	void update(int dt);
+	void update(float dt);
 	void handleEvents();
 	void createBalloon(Point2D<float> origin);
 
@@ -66,19 +67,18 @@ public:
 	Game();
 	~Game();
 
-	//
+	// Carga el archivo de un nivel.
 	void LoadLevel(const string& entrada);
 
-	// Obtiene una textura por su nombre
+	// Obtiene una textura por su nombre.
 	Texture* getTexture(TextureName name) const;
 
-	// Ejecuta el bucle principal del juego
+	// Ejecuta el bucle principal del juego.
 	void run();
 
 	// Comprueba si hay algún objeto colocado en ese rectángulo
 	// bool checkCollision(const Rectangle& rect);
 	void createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos);
-
 
 	// Comprueba si el rectángulo recibido, que es el de la punta de la flecha, colisiona con algún globo.
 	// Devuelve true si es el caso.

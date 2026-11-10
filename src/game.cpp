@@ -17,6 +17,14 @@ constexpr const char* const WINDOW_TITLE = "Bow & Arrow 1.0";
 constexpr const char* IMAGE_ROOT = "../assets/images/";
 constexpr const char* LEVEL_ROOT = "../assets/levels/"; 
 
+// tamaño que tendrán los objetos en la pantalla:
+const float BOW_WIDTH = 90;
+const float BOW_HEIGHT = 90;
+const float BALLOON_WIDTH = 90;
+const float BALLOON_HEIGHT = 90;
+const float ARROW_WIDTH = 90;
+const float ARROW_HEIGHT = 20;
+
 // Estructura para especificar las texturas que hay que
 // cargar y el tamaño de su matriz de frames
 struct TextureSpec
@@ -105,7 +113,7 @@ Game::Game()
 		throw string("ERROR: Fichero de imagen no encontrado o inválido."); // Excepción
 	}
 	// Crear los objetos del juego
-	Jugador = new Arco({0,250}, getTexture(BOW), this);
+	Jugador = new Arco(this, getTexture(BOW), { 0,250 }, BOW_WIDTH, BOW_HEIGHT, {0, 0.5});
 }
 
 // Se libera la posible memoria reservada.
@@ -154,7 +162,7 @@ Game::render() const
 
 // Procesa los cambios de cada elemento.
 void
-Game::update(int dt)
+Game::update(float dt)
 {
 	Jugador->update(dt); // El jugador realiza sus cambios de estado.
 
@@ -223,14 +231,14 @@ Game::createBalloon(Point2D<float> origin)
 	float posVar = uniform_real_distribution<float>(-100, 325)(randomGenerator);
 	Point2D<float> pos = { origin.getX() + posVar, origin.getY()};
 
-	balloons.push_back(new Balloon(pos, { 0, -speedVar }, color, getTexture(BALLOON), 0)); // Lo crea y mete al vector.
+	balloons.push_back(new Balloon(this, getTexture(BALLOON), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
 }
 
 // Crea una flecha y la mete al vector de flechas.
 void
 Game::createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos) {
 
-	arrows.push_back(new flecha(bowPos + reltvOrigin, getTexture(ARROW), this));
+	arrows.push_back( new flecha(this, getTexture(ARROW), bowPos + reltvOrigin, ARROW_WIDTH, ARROW_HEIGHT, {1, 0} ));
 
 }
 

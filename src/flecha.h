@@ -3,54 +3,24 @@
 #pragma once
 
 #include "vector2D.h"
-#include "rectangle.h"
 #include "texture.h"
-#include "game.h"
+#include "MobileObject.h"
 
 //Declaracioón anticipada
 class Game;
 
 
-class flecha
+class flecha : public MobileObject
 {
-private:
-
-	 float WIDTH = 90;
-	 float HEIGHT = 20;
-
-	Texture* texture;
-
-	// Posicion y dimesiones.
-	Rectangle pos;
-
-	// Velocidad de movimiento.
-	Vector2D<float> vel;
-
-	// Puntero a game.
-	Game* game;
-
-
 public:
 
-	flecha(Point2D<float> pos, Texture* textr, Game* game) :
-		texture(textr),
-		pos(pos, WIDTH, HEIGHT),
-		game(game),
-		vel ({1, 0})
-	{
-	};
+	flecha(Game* myGame, Texture* myTexture, Point2D<float> myPos, float myWidht, float myHeight, Vector2D<float> myVel) :
+		MobileObject(myGame, myTexture, myPos, myWidht, myHeight, myVel)
+	{};
 
 	~flecha();
 
-	bool hit(const Rectangle& obj);
-
-	void render() const;
-
-	void move(int dt);
-
-	bool update(int dt);
-
-
+	bool update(float dt) override; // Actualiza el estado de la flecha (pos) y devuelve false si se tiene que eliminar.
 
 };
 

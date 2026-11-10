@@ -5,56 +5,32 @@
 #include "vector2D.h"
 #include "rectangle.h"
 #include "texture.h"
+#include "MobileObject.h"
 
-
-constexpr float WIDTH = 90;//const
-constexpr float HEIGHT = 90;//const
 // Tiempo que pasa entre un frame y otro en la animación de destruir.
 constexpr float CICLES_BETWEEN_FRAMES = 150;
 
-class Balloon
+class Game;
+
+class Balloon : public MobileObject
 {
 private:
-	// Puntero a la textura.
-	Texture* textura;
-
-	// Posicion y dimesiones.
-	Rectangle pos;
-
-	//Color
-	int colorIndex;
-	
-	// Velocidad de movimiento.
-	Vector2D<float> vel;
-
-	// Indice del frame en la animación de destrucción.
-	int indice;//const
-
 	// Detecta el estado del globo.
-	bool explotado;
+	bool explotado = false;
 
 	// Guarda el tiempo actual de la animación de destrucción.
 	float ciclAnimAct = CICLES_BETWEEN_FRAMES;
 
 public:
 
-	Balloon(Point2D<float> pos, Vector2D<float> vel, int color, Texture* textr, int arrayIndex) :
-		colorIndex(color),
-		textura(textr),
-		pos(pos, WIDTH, HEIGHT),
-		indice(arrayIndex),
-		vel(vel),
-		explotado(false)
+	Balloon(Game* myGame, Texture* myTexture, Point2D<float> myPos, float myWidht, float myHeight, Vector2D<float> myVel, int myColor) :
+		MobileObject(myGame, myTexture, myPos, myWidht, myHeight, myVel, myColor)
 	{};
 
-	bool hit(const Rectangle&);
+	bool hit(const Rectangle&) override; // Cambia el estado de explotado en función de si colisiona con el rectángulo pasado o no.
 
-	void render() const;
+	bool update(float dt) override; // Actualiza el estado del globo, en función de si está explotado o no.
 
-	void move(int dt);
-
-	bool update(int dt);
-
-	bool popBalloon();
+	bool popBalloon(); // Cambia los frames del globo. Se usa en el update.
 };
 

@@ -3,60 +3,39 @@
 #pragma once
 
 #include "vector2D.h"
-#include "rectangle.h"
 #include "texture.h"
-#include "game.h"
+#include "SceneObject.h"
 
 //Declaracioón anticipada
-class Game;
+//class Game;
 
-class Arco
-{
+class Arco : public SceneObject {
 private:
-
-	const float WIDTH = 90;
-	const float HEIGHT = 90;
-	// Velocidad de movimiento.
-	Vector2D<float> VEL = {0, 0.5}; // pix / ms
+	// La velocidad a la que se moverá el arco.
+	Vector2D<float> vel;
 
 	// Valdrá true (1) si está descargado, y false (0) si tiene flecha.
 	bool descargado = true;
-
-	Texture* texture;
-
-	// Posicion y dimesiones.
-	Rectangle pos;
 
 	// Dirección del movimiento.
 	float dir = 0;
 
 	// Número de flechas que tendrá disponible el jugador.
-	int numFlechas;
-
-	// Puntero a game.
-	Game* game;
-
-	
+	int numFlechas = 0;
 
 public:
 
-	Arco(Point2D<float> pos, Texture* textr, Game* game) :
-		texture(textr),
-		pos(pos, WIDTH, HEIGHT),
-		numFlechas(0),
-		game(game)
-	{
-	};
+	Arco(Game* myGame, Texture* myTexture, Point2D<float> myPos, float myWidht, float myHeight, Vector2D<float> myVel) :
+		SceneObject(myGame, myTexture, myPos, myWidht, myHeight),
+		vel(myVel)
+	{};
 
-	void render() const;
+	void move(Vector2D<float> vel, float dir, int dt); // Realiza el movimiento del objeto cambiando la posición del rect pos en función de la velocidad, dirección y deltaTime.
 
-	void move(Vector2D<float> vel, float dir, int dt);
+	void handleEvent(const SDL_Event& event); // Maneja el input del jugador y cambia su estado (dir) en función de él.
 
-	void handleEvent(const SDL_Event& event);
-
-	bool update(int dt);
+	bool update(float dt) override; // Cambia el estado (pos) en función de la dirección de movimiento (dir).
 	
-	void setNumArrows(int na);
+	void setNumArrows(int na); // Cambia el número de flechas disponibles. Se llama al cargar un nivel desde un archivo.
 
 };
-
