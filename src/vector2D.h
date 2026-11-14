@@ -41,8 +41,18 @@ public:
 	Vector2D operator*(const float coef) {
 		return { x * coef, y * coef };
 	}
+	Vector2D operator*=(const float coef) {
+		this->x *= coef;
+		this->y *= coef;
+		return *this;
+	}
 	Vector2D operator/(const float coef) {
 		return { x / coef, y / coef };
+	}
+	Vector2D operator/=(const float coef) {
+		this->x /= coef;
+		this->y /= coef;
+		return *this;
 	}
 
 	// TODO: completar
