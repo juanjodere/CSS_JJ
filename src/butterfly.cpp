@@ -3,7 +3,7 @@
 #include <random>
 
 //Random Generator
-std::mt19937_64 randomGenerator;
+//std::mt19937_64 randomGenerator;
 
 butterfly::butterfly(Game* game, Texture* myTexture, istream& juegoGuardado) : MobileObject(game, myTexture, juegoGuardado) {
 
@@ -42,11 +42,11 @@ void butterfly::manageMovement(float dt) {
 
 	if (actualTime >= DIRECTION_CHANGING_TIME) {
 
-		int dirX = std::uniform_int_distribution<int>(0, 1)(randomGenerator); // Genera un aleatorio entre 0 y 1, y si sale 0, lo cambia por -1
+		/*int dirX = std::uniform_int_distribution<int>(0, 1)(randomGenerator); // Genera un aleatorio entre 0 y 1, y si sale 0, lo cambia por -1
 		if (dirX == 0) dirX == -1;
 		int dirY = std::uniform_int_distribution<int>(0, 1)(randomGenerator);// Genera un aleatorio entre 0 y 1, y si sale 0, lo cambia por -1
-		if (dirY == 0) dirY == -1;
-
+		if (dirY == 0) dirY == -1; */
+		int dirX = -1; int dirY = 1;
 		giveDirection(dirX, dirY);
 		
 		actualTime = 0;

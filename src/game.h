@@ -16,6 +16,9 @@
 #include "butterfly.h"
 #include "Arco.h"
 #include "flecha.h"
+#include "FileFormatError.h"
+#include "SDLError.h"
+#include "FileNotFoundError.h"
 
 using namespace std;
 

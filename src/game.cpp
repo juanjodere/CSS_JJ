@@ -70,7 +70,7 @@ void Game::LoadLevel(const string& entrada) {
 	ifstream guardado;
 	guardado.open(LEVEL_ROOT + entrada); // Abre el archivo.
 
-	if (!guardado.is_open())throw string("ERROR: No se ha encontrado el fichero del nivel."); // Excepción
+	if (!guardado.is_open()) throw FileNotFoundError(LEVEL_ROOT + entrada); // Excepción
 	else {
 		string clave = " ";
 		while (!guardado.fail()) { // Mientras siga abierto.
@@ -99,12 +99,12 @@ Game::Game()
 {
 	// Carga SDL y crea la ventana con su renderizador
 	if (!SDL_Init(SDL_INIT_VIDEO))
-		throw string("ERROR: No se ha podido inicializar SDL."); // Excepción
+		throw new SDLError(); // Excepción
 
 	if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE,
 	                                 WINDOW_WIDTH, WINDOW_HEIGHT,
 	                                 0, &window, &renderer))
-	throw string("ERROR: No se han podido crear la ventana y el renderer."); // Excepción
+	throw new SDLError(); // Excepción
 
 	// Carga las texturas.
 	try {
@@ -122,13 +122,13 @@ Game::Game()
 			delete textures[i];
 			textures[i] = nullptr;
 		}
-		throw string("ERROR: Fichero de imagen no encontrado o inválido."); // Excepción
+		throw FileNotFoundError(IMAGE_ROOT); // Excepción
 	}
 	// Crear los objetos del juego
 	Jugador = new Arco(this, getTexture(BOW), { 0,250 }, BOW_WIDTH, BOW_HEIGHT, {0, 0.5});
 
 	for (int i = 0; i < numButterflies; ++i) {
-		Point2D<float> pos = { uniform_real_distribution<float>(-100, 325)(randomGenerator), uniform_real_distribution<float>(-100, 325)(randomGenerator) };
+		Point2D<float> pos = { uniform_real_distribution<float>(100,100)(randomGenerator), uniform_real_distribution<float>(100, 100)(randomGenerator) };
 		createButterfly(pos);
 	}
 }
@@ -260,14 +260,13 @@ Game::createBalloon(Point2D<float> origin)
 void
 Game::createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos) {
 
-	//cout << "flecha";
 	objects.push_back( new flecha(this, getTexture(ARROW), bowPos + reltvOrigin, ARROW_WIDTH, ARROW_HEIGHT, {1, 0} ));
-	//cout << "flechaFin";
 
 }
 
 // Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
-bool Game::checkCollison(const Rectangle& tip) {
+bool
+Game::checkCollison(const Rectangle& tip) {
 	int i = 0;
 	bool enc = false;
 	while(i < objects.size() && !enc) { // Cada globo comprueba si choca.
@@ -282,87 +281,102 @@ bool Game::checkCollison(const Rectangle& tip) {
 }
 
 // Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
-int Game::getPoints() {
+int
+Game::getPoints() {
 
 	return points;
 }
 
 // Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
-void Game::setPoints(int pts) {
+void
+Game::setPoints(int pts) {
 
 	points += pts;
 }
 
-void Game::saveGame() {
+void
+Game::saveGame() {
 	ofstream juego;
 	juego.open(SAVE_ROOT + string("partidaGuardada.txt"), std::ofstream::out | std::ofstream::trunc);
 
-	if (!juego.is_open())throw string("ERROR: No se ha encontrado una partida guardada."); // Excepción
+	if (!juego.is_open()) throw FileNotFoundError(SAVE_ROOT + string("partidaGuardada.txt")); // Excepción
 	else {
 
-		juego << "N " << Nivel << " P " << points << "\n";
+		try {
+
+			juego << "N " << Nivel << " P " << points << "\n";
 
 
-		for (size_t i = 0; i < objects.size(); ++i) {
-			objects[i]->saveObj(juego);
+			for (size_t i = 0; i < objects.size(); ++i) {
+				objects[i]->saveObj(juego);
+			}
+		}
+		catch (GameError error) {
+			throw FileFormatError(SAVE_ROOT + string("partidaGuardada.txt"), 3);
 		}
 	}
 	juego.close(); // Cierra el archivo.
-	//std::cout << "save";
 }
 
-void Game::openGame() {
+void
+Game::openGame() {
 	ifstream juego;
 	juego.open(SAVE_ROOT + string("partidaGuardada.txt")); // Abre el archivo.
 
-	if (!juego.is_open())throw string("ERROR: No se ha encontrado una partida guardada."); // Excepción
+	if (!juego.is_open()) throw new FileNotFoundError(SAVE_ROOT + string("partidaGuardada.txt")); // Excepción
 	else {
 
-		objects.clear();
+		try {
 
-		char clave = juego.get();
-		//std::cout << clave;
+			objects.clear();
 
-		if (clave == 'N') {
-			juego.get();
-			string nivel;
-			while (clave != ' ')
-			{
-				clave = juego.get();
-				nivel += clave;
-				//std::cout << clave;
-			}
-			Nivel = stoi(nivel);
-		}
-		//std::cout << clave;
-		clave = juego.get();
-		//std::cout << clave;
-		if (clave == 'P') {
-			juego.get();
-			string pts;
-			while (clave != ' ' && clave != '\n')
-			{
-				clave = juego.get();
-				pts += clave;
-			}
-			points = stoi(pts);
-			//std::cout << pts;
-		}
-		
+			char clave = juego.get();
 			//std::cout << clave;
-		while (!juego.fail()) { // Mientras siga abierto.
+
+			if (clave == 'N') {
+				juego.get();
+				string nivel;
+				while (clave != ' ')
+				{
+					clave = juego.get();
+					nivel += clave;
+					//std::cout << clave;
+				}
+				Nivel = stoi(nivel);
+			}
+			//std::cout << clave;
 			clave = juego.get();
-			if (clave == 'B') {
-				objects.push_back(new Balloon(this, getTexture(BALLOON), juego));
-				//std::cout << " Bya ";
+			//std::cout << clave;
+			if (clave == 'P') {
+				juego.get();
+				string pts;
+				while (clave != ' ' && clave != '\n')
+				{
+					clave = juego.get();
+					pts += clave;
+				}
+				points = stoi(pts);
+				//std::cout << pts;
 			}
-			else if(clave == 'F') {
-				objects.push_back(new flecha(this, getTexture(ARROW), juego));
+
+			//std::cout << clave;
+			while (!juego.fail()) { // Mientras siga abierto.
+				clave = juego.get();
+				if (clave == 'B') {
+					objects.push_back(new Balloon(this, getTexture(BALLOON), juego));
+					//std::cout << " Bya ";
+				}
+				else if (clave == 'F') {
+					objects.push_back(new flecha(this, getTexture(ARROW), juego));
+				}
+				else if (clave == 'M') {
+					//objects.push_back(new butterfly(this, getTexture(BUTTERFLY), juego));
+				}
+				else juego.get(); // Si no se sabe qué pone, se ignora la línea entera.
 			}
-			else if (clave == 'M') {
-				//objects.push_back(new butterfly(this, getTexture(BUTTERFLY), juego));
-			}
-			else juego.get(); // Si no se sabe qué pone, se ignora la línea entera.
+		}
+		catch(GameError error){
+			throw FileFormatError(SAVE_ROOT + string("partidaGuardada.txt"), 3);
 		}
 	}
 
