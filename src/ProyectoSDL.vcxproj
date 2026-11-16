@@ -99,26 +99,36 @@
   <ItemGroup>
     <ClCompile Include="Arco.cpp" />
     <ClCompile Include="Balloon.cpp" />
+    <ClCompile Include="butterfly.cpp" />
+    <ClCompile Include="FileFormatError.cpp" />
+    <ClCompile Include="FileNotFoundError.cpp" />
     <ClCompile Include="flecha.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="GameError.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InfoBar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MobileObject.cpp" />
     <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="SceneObject.cpp" />
+    <ClCompile Include="SDLError.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arco.h" />
     <ClInclude Include="Balloon.h" />
+    <ClInclude Include="butterfly.h" />
+    <ClInclude Include="FileFormatError.h" />
+    <ClInclude Include="FileNotFoundError.h" />
     <ClInclude Include="flecha.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="GameError.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InfoBar.h" />
     <ClInclude Include="MobileObject.h" />
     <ClInclude Include="rectangle.h" />
     <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="SDLError.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="vector2D.h" />
   </ItemGroup>

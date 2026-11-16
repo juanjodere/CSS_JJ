@@ -1,15 +1,19 @@
 #pragma once
+#include "vector2D.h"
+#include "rectangle.h"
+#include "texture.h"
 #include "MobileObject.h"
 
-//class Game;
+
+constexpr float DIRECTION_CHANGING_TIME = 500;
+
+constexpr float FALLING_VEL = 0.45;
+
+class Game;
 
 class butterfly : public MobileObject
 {
 private:
-
-	const float DIRECTION_CHANGING_TIME = 500;
-
-	const float FALLING_VEL = 0.45;
 
 	float actualTime = 0;
 
@@ -39,10 +43,12 @@ public:
 		MobileObject(myGame, myTexture, myPos, myWidht, myHeight, myVel, anim)
 	{};
 
+	butterfly(Game * game, Texture * myTexture, istream & juegoGuardado);
+
 	bool update(float dt) override;
 
 	bool hit(const Rectangle&) override;
-	butterfly(Game* game, Texture* myTexture, istream& juegoGuardado);
+
 	void saveObj(ostream& archivo); // Cambia los frames del globo. Se usa en el update.
 
 };

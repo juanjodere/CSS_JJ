@@ -1,4 +1,5 @@
 #include "butterfly.h"
+#include "game.h"
 #include <random>
 
 //Random Generator
@@ -17,6 +18,7 @@ butterfly::butterfly(Game* game, Texture* myTexture, istream& juegoGuardado) : M
 	}
 	SceneObject::animIndex = stoi(a);
 };
+
 bool butterfly::update(float dt) {
 
 	if (dead) {
@@ -138,9 +140,11 @@ bool butterfly::hit(const Rectangle& rect) {
 
 	vel = {0, FALLING_VEL};
 
-	SceneObject::hit(rect);
+	dead = SceneObject::hit(rect);
 
+	return dead;
 }
+
 void butterfly::saveObj(ostream& archivo) {
 	archivo << "M";
 	MobileObject::saveObj(archivo);

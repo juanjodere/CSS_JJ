@@ -26,6 +26,9 @@ const float BALLOON_WIDTH = 90;
 const float BALLOON_HEIGHT = 90;
 const float ARROW_WIDTH = 90;
 const float ARROW_HEIGHT = 20;
+const float BUTTERFLY_WIDTH = 90;
+const float BUTTERFLY_HEIGHT = 20;
+const float BUTTERFLY_VEL = 0.25;
 
 // Estructura para especificar las texturas que hay que
 // cargar y el tamaño de su matriz de frames
@@ -57,6 +60,8 @@ Point2D<float>  relativeOriginArrow(0, 4);
 // Almacena los milisegundos que pasan entre la aparición de un globo y el siguiente.
 int ballTimeCount = 0;
 
+int numButterflies = 0;
+
 bool partidaCargada = false;
 
 // Cambia variables del game y otros elementos en base a un archivo en la carpeta LEVEL_ROOT.
@@ -76,6 +81,9 @@ void Game::LoadLevel(const string& entrada) {
 				int na = 0;
 				guardado >> na;
 				Jugador->setNumArrows(na);
+			}
+			else if (clave == "butterflies") {
+				guardado >> numButterflies;
 			}
 			else guardado.ignore('\n'); // Si no se sabe qué pone, se ignora la línea entera.
 		}
@@ -114,11 +122,15 @@ Game::Game()
 			delete textures[i];
 			textures[i] = nullptr;
 		}
-
 		throw string("ERROR: Fichero de imagen no encontrado o inválido."); // Excepción
 	}
 	// Crear los objetos del juego
 	Jugador = new Arco(this, getTexture(BOW), { 0,250 }, BOW_WIDTH, BOW_HEIGHT, {0, 0.5});
+
+	for (int i = 0; i < numButterflies; ++i) {
+		Point2D<float> pos = { uniform_real_distribution<float>(-100, 325)(randomGenerator), uniform_real_distribution<float>(-100, 325)(randomGenerator) };
+		createButterfly(pos);
+	}
 }
 
 // Se libera la posible memoria reservada.
@@ -223,6 +235,15 @@ Game::handleEvents()
 	}
 }
 
+// Crea una mariposa y la mete al array de objetos.
+void
+Game::createButterfly(Point2D<float> origin) {
+	Vector2D<float> vel = {float( uniform_int_distribution<int>(-1, 0)(randomGenerator) ) , float ( uniform_int_distribution<int>(-1, 0)(randomGenerator) )};
+	if (vel.getX() == 0) vel = { 1, vel.getY() }; if (vel.getY() == 0) vel = { vel.getX(), 1 };
+
+	objects.push_back(new butterfly(this, getTexture(BUTTERFLY), origin, BUTTERFLY_WIDTH, BUTTERFLY_HEIGHT, { BUTTERFLY_VEL * vel.getX(), BUTTERFLY_VEL * vel.getY() }));
+}
+
 // Crea un globo, con coordenada en x, color y velocidad aleatoria.
 void
 Game::createBalloon(Point2D<float> origin)
@@ -234,18 +255,8 @@ Game::createBalloon(Point2D<float> origin)
 
 	objects.push_back(new Balloon(this, getTexture(BALLOON), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
 }
-/*void
-Game::createButterfly(Point2D<float> origin)
-{	// Aleatoriza el color (fila de la textura), velocidad y posición del globo.
-	int color = uniform_int_distribution<int>(0, 6)(randomGenerator);
-	float speedVar = uniform_real_distribution<float>(0.05, 0.5)(randomGenerator);
-	float posVar = uniform_real_distribution<float>(-100, 325)(randomGenerator);
-	Point2D<float> pos = { origin.getX() + posVar, origin.getY() };
 
-	objects.push_back(new butterfly(this, getTexture(BUTTERFLY), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
-}*/
-
-// Crea una flecha y la mete al vector de flechas.
+// Crea una flecha y la mete al vector de objetos..
 void
 Game::createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos) {
 
@@ -269,16 +280,19 @@ bool Game::checkCollison(const Rectangle& tip) {
 
 	return enc;
 }
+
 // Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
 int Game::getPoints() {
 
 	return points;
 }
+
 // Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
 void Game::setPoints(int pts) {
 
 	points += pts;
 }
+
 void Game::saveGame() {
 	ofstream juego;
 	juego.open(SAVE_ROOT + string("partidaGuardada.txt"), std::ofstream::out | std::ofstream::trunc);
@@ -296,6 +310,7 @@ void Game::saveGame() {
 	juego.close(); // Cierra el archivo.
 	//std::cout << "save";
 }
+
 void Game::openGame() {
 	ifstream juego;
 	juego.open(SAVE_ROOT + string("partidaGuardada.txt")); // Abre el archivo.

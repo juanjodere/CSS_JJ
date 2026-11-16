@@ -13,7 +13,7 @@
 #include "vector2D.h"
 #include "rectangle.h"
 #include "Balloon.h"
-//#include "butterfly.h"
+#include "butterfly.h"
 #include "Arco.h"
 #include "flecha.h"
 

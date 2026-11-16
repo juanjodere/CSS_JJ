@@ -7,10 +7,8 @@ Balloon::Balloon(Game* game, Texture* myTexture, istream& juegoGuardado) : Mobil
 
 	char clave = juegoGuardado.get();
 	string c;
-	//cout << clave;
 	while (clave != ' ')
 	{
-		//cout << clave;
 		c += clave;
 		clave = juegoGuardado.get();
 	}
@@ -18,15 +16,14 @@ Balloon::Balloon(Game* game, Texture* myTexture, istream& juegoGuardado) : Mobil
 	clave = juegoGuardado.get();
 	while (clave != ' ' && clave != '\n')
 	{
-		//cout << clave;
 		e += clave;
 		clave = juegoGuardado.get();
 	}
 	SceneObject::animIndex = stoi(c);
 	if (stoi(e)>0) explotado = true;
 
-	//cout << "Const balloon istream";
 };
+
 // Cambia el frame de la animación de explosión del globo a la siguiente, y devuelve true cuando esta termina.
 bool
 Balloon::popBalloon() {
