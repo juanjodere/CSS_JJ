@@ -3,6 +3,29 @@
 
 const int textureSize = 256;
 
+Balloon::Balloon(Game* game, Texture* myTexture, istream& juegoGuardado) : MobileObject(game, myTexture, juegoGuardado){
+
+	char clave = juegoGuardado.get();
+	string c;
+	while (clave != ' ')
+	{
+		cout << clave;
+		c += clave;
+		clave = juegoGuardado.get();
+	}
+	string e;
+	clave = juegoGuardado.get();
+	while (clave != ' ')
+	{
+		cout << clave;
+		e += clave;
+		clave = juegoGuardado.get();
+	}
+	SceneObject::animIndex = stoi(c);
+	if (stoi(e)>0) explotado = true;
+
+	cout << "Const balloon istream";
+};
 // Cambia el frame de la animación de explosión del globo a la siguiente, y devuelve true cuando esta termina.
 bool
 Balloon::popBalloon() {
@@ -39,4 +62,10 @@ bool Balloon::hit(const Rectangle& tip) {
 	if (!explotado)
 		explotado = MobileObject::hit(tip); // explotado es true si tip interseca con pos.
 	return explotado;
+}
+
+void Balloon::saveObj(ostream& archivo) {
+	archivo << "B";
+	MobileObject::saveObj(archivo);
+	archivo << " " << SceneObject::animIndex << " " << explotado << "\n";
 }

@@ -27,10 +27,14 @@ public:
 		MobileObject(myGame, myTexture, myPos, myWidht, myHeight, myVel, myColor)
 	{};
 
+	Balloon(Game* game, Texture* myTexture, istream& juegoGuardado);
+
 	bool hit(const Rectangle&) override; // Cambia el estado de explotado en función de si colisiona con el rectángulo pasado o no.
 
 	bool update(float dt) override; // Actualiza el estado del globo, en función de si está explotado o no.
 
 	bool popBalloon(); // Cambia los frames del globo. Se usa en el update.
+
+	void saveObj(ostream& archivo); // Cambia los frames del globo. Se usa en el update.
 };
 

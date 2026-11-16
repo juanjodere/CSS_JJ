@@ -58,10 +58,12 @@ private:
 
 	// Elemento del juego
 	// TODO: añadir atributos para los objetos del juego
-	vector<Balloon*> balloons;
-	vector<flecha*> arrows;
+
+	vector<SceneObject*> objects;
 	Arco* Jugador;
 	int baldelay;
+	int points;
+	int Nivel;
 
 public:
 	Game();
@@ -83,6 +85,13 @@ public:
 	// Comprueba si el rectángulo recibido, que es el de la punta de la flecha, colisiona con algún globo.
 	// Devuelve true si es el caso.
 	bool checkCollison(const Rectangle&);
+
+	int getPoints();
+	void setPoints(int pts);
+	// Carga el archivo de un nivel.
+	void saveGame();
+	// Carga el archivo de un nivel.
+	void openGame();
 };
 
 inline Texture*

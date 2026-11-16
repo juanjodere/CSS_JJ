@@ -15,7 +15,8 @@ using namespace std;
 // Constantes 
 constexpr const char* const WINDOW_TITLE = "Bow & Arrow 1.0";
 constexpr const char* IMAGE_ROOT = "../assets/images/";
-constexpr const char* LEVEL_ROOT = "../assets/levels/"; 
+constexpr const char* LEVEL_ROOT = "../assets/levels/";
+constexpr const char* SAVE_ROOT = "../assets/savedgames/";
 
 // tamaño que tendrán los objetos en la pantalla:
 const float BOW_WIDTH = 90;
@@ -54,6 +55,8 @@ Point2D<float>  relativeOriginArrow(0, 4);
 // Almacena los milisegundos que pasan entre la aparición de un globo y el siguiente.
 int ballTimeCount = 0;
 
+bool partidaCargada = false;
+
 // Cambia variables del game y otros elementos en base a un archivo en la carpeta LEVEL_ROOT.
 // Relanza excepciones en caso de capturar alguna.
 void Game::LoadLevel(const string& entrada) {
@@ -82,7 +85,7 @@ void Game::LoadLevel(const string& entrada) {
 // Construye el objeto Game e instancia un jugador.
 // Relanza excepciones si captura alguna.
 Game::Game()
-  : exit(false), balloons(), baldelay(12)
+  : exit(false), objects(), baldelay(12)
 {
 	// Carga SDL y crea la ventana con su renderizador
 	if (!SDL_Init(SDL_INIT_VIDEO))
@@ -127,14 +130,9 @@ Game::~Game()
 		textures[i] = nullptr;
 	}
 
-	for (size_t i = 0; i < arrows.size(); ++i) { // Borra las flechas que existiesen.
-		delete arrows[i];
-		arrows[i] = nullptr;
-	}
-
-	for (size_t i = 0; i < balloons.size(); ++i) { // Borra los globos que existiesen.
-		delete balloons[i];
-		balloons[i] = nullptr;
+	for (size_t i = 0; i < objects.size(); ++i) { // Borra las flechas que existiesen.
+		delete objects[i];
+		objects[i] = nullptr;
 	}
 
 	// Deja que el resto de variables salgan de término.
@@ -150,11 +148,8 @@ Game::render() const
 
 	Jugador->render(); // Renderiza el jugador.
 
-	for (int i = 0; i < balloons.size(); ++i) { // Renderiza globos.
-		balloons[i]->render();
-	}
-	for (int i = 0; i < arrows.size(); ++i) { // Renderiza flechas.
-		arrows[i]->render();
+	for (int i = 0; i < objects.size(); ++i) { // Renderiza globos.
+		objects[i]->render();
 	}
 
 	SDL_RenderPresent(renderer);
@@ -166,19 +161,11 @@ Game::update(float dt)
 {
 	Jugador->update(dt); // El jugador realiza sus cambios de estado.
 
-	for (int i = 0; i < balloons.size(); ++i) { // Los globos realizan sus cambios de estado.
-		bool active = balloons[i]->update(dt);
+	for (int i = 0; i < objects.size(); ++i) { // Los globos realizan sus cambios de estado.
+		bool active = objects[i]->update(dt);
 		if (!active) { // Si debe borrar un globo, lo borra.
-			delete balloons[i];
-			balloons.erase(balloons.begin() + i);
-		}
-	}
-
-	for (int i = 0; i < arrows.size(); ++i) { // Las flechas realizan cambios de estado.
-		bool active = arrows[i]->update(dt);
-		if (!active) { // Si debe borrar una flecha, la borra.
-			delete arrows[i];
-			arrows.erase(arrows.begin() + i);
+			delete objects[i];
+			objects.erase(objects.begin() + i);
 		}
 	}
 
@@ -199,11 +186,15 @@ Game::run()
 		startTime = SDL_GetTicks(); // Momento en el que inicia
 
 		handleEvents();
-		update(FRAME_PERIOD);
-		render();
+		//if (!partidaCargada) {
+			update(FRAME_PERIOD);
+			render();
+			partidaCargada = false;
+		//}
 		frameTime = SDL_GetTicks() - startTime; // Actualiza el tiempo actual.
 		if (frameTime < FRAME_PERIOD) // Fuerza que el bucle empiece cada FRAME_PERIOD
 			SDL_Delay(FRAME_PERIOD - frameTime);
+		
 	}
 }
 
@@ -219,6 +210,17 @@ Game::handleEvents()
 			exit = true;
 
 		Jugador->handleEvent(event);// El arco maneja sus eventos
+
+		const bool* keys = SDL_GetKeyboardState(nullptr); // Analiza teclado.
+		if (keys[SDL_SCANCODE_LCTRL]) {
+			if (keys[SDL_SCANCODE_S]) {
+				saveGame();
+			}
+			else if (keys[SDL_SCANCODE_O]) {
+				openGame();
+				partidaCargada = true;
+			}
+		}
 	}
 }
 
@@ -231,14 +233,16 @@ Game::createBalloon(Point2D<float> origin)
 	float posVar = uniform_real_distribution<float>(-100, 325)(randomGenerator);
 	Point2D<float> pos = { origin.getX() + posVar, origin.getY()};
 
-	balloons.push_back(new Balloon(this, getTexture(BALLOON), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
+	objects.push_back(new Balloon(this, getTexture(BALLOON), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
 }
 
 // Crea una flecha y la mete al vector de flechas.
 void
 Game::createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos) {
 
-	arrows.push_back( new flecha(this, getTexture(ARROW), bowPos + reltvOrigin, ARROW_WIDTH, ARROW_HEIGHT, {1, 0} ));
+	cout << "flecha";
+	objects.push_back( new flecha(this, getTexture(ARROW), bowPos + reltvOrigin, ARROW_WIDTH, ARROW_HEIGHT, {1, 0} ));
+	cout << "flechaFin";
 
 }
 
@@ -246,10 +250,98 @@ Game::createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos) {
 bool Game::checkCollison(const Rectangle& tip) {
 	int i = 0;
 	bool enc = false;
-	while(i < balloons.size() && !enc) { // Cada globo comprueba si choca.
-		if (!balloons[i]->hit(tip)) ++i;
-		else enc = true; // Si choca, deja de buscar.
+	while(i < objects.size() && !enc) { // Cada globo comprueba si choca.
+		if (typeid(*objects[i]) == typeid(Balloon)) {
+			if (!objects[i]->hit(tip)) ++i;
+			else enc = true; // Si choca, deja de buscar.
+		}
+		else i++;
 	}
 
 	return enc;
+}
+// Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
+int Game::getPoints() {
+
+	return points;
+}
+// Recibe el rectángulo de la punta de la flecha y comprueba si explota globos.
+void Game::setPoints(int pts) {
+
+	points += pts;
+}
+void Game::saveGame() {
+	ofstream juego;
+	juego.open(SAVE_ROOT + string("partidaGuardada.txt"), std::ofstream::out | std::ofstream::trunc);
+
+	if (!juego.is_open())throw string("ERROR: No se ha encontrado una partida guardada."); // Excepción
+	else {
+
+		juego << "N " << Nivel << " P " << points << "\n";
+
+
+		for (size_t i = 0; i < objects.size(); ++i) {
+			objects[i]->saveObj(juego);
+		}
+	}
+	juego.close(); // Cierra el archivo.
+	std::cout << "save";
+}
+void Game::openGame() {
+	ifstream juego;
+	juego.open(SAVE_ROOT + string("partidaGuardada.txt")); // Abre el archivo.
+
+	if (!juego.is_open())throw string("ERROR: No se ha encontrado una partida guardada."); // Excepción
+	else {
+		
+		for (size_t i = 0; i < objects.size(); ++i) { // Borra los objetos que existiesen.
+			delete objects[i];
+			objects[i] = nullptr;
+		}
+
+		char clave = juego.get();
+			std::cout << clave;
+
+		if (clave == 'N') {
+			juego.get();
+			string nivel;
+			while (clave != ' ')
+			{
+				clave = juego.get();
+				nivel += clave;
+				std::cout << clave;
+			}
+			Nivel = stoi(nivel);
+		}
+		std::cout << clave;
+		clave = juego.get();
+		std::cout << clave;
+		if (clave == 'P') {
+			juego.get();
+			string pts;
+			while (clave != ' ')
+			{
+				clave = juego.get();
+				pts += clave;
+			}
+			points = stoi(pts);
+			std::cout << pts;
+		}
+		juego.ignore('\n'); // Si no se sabe qué pone, se ignora la línea entera. 
+		
+			std::cout << clave;
+		while (!juego.fail()) { // Mientras siga abierto.
+			clave = juego.get();
+			if (clave == 'B') {
+				objects.push_back(new Balloon(this, getTexture(BALLOON), juego));
+			}
+			else if(clave == 'F') {
+				objects.push_back(new flecha(this, getTexture(ARROW), juego));
+			}
+			else juego.ignore('\n'); // Si no se sabe qué pone, se ignora la línea entera.
+		}
+	}
+
+	juego.close(); // Cierra el archivo.
+	std::cout << "open";
 }

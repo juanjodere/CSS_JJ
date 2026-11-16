@@ -18,9 +18,12 @@ public:
 		MobileObject(myGame, myTexture, myPos, myWidht, myHeight, myVel)
 	{};
 
+	flecha(Game * game, Texture * myTexture, istream & juegoGuardado);
+
 	~flecha();
 
 	bool update(float dt) override; // Actualiza el estado de la flecha (pos) y devuelve false si se tiene que eliminar.
 
+	void saveObj(ostream& archivo);
 };
 

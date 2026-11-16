@@ -21,8 +21,12 @@ public:
 		SceneObject(myGame, myTexture, myPos, myWidht, myHeight, anim),
 		vel(myVel)
 	{};
+
+
+	MobileObject(Game* game, Texture* myTexture, istream &juegoGuardado);
 	
 	bool update(float dt) override; // Realiza un desplazamiento (cambiando pos) en función de la velocidad y el deltaTime.
 
+	virtual void saveObj(ostream&);
 };
 

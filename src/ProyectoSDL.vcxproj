@@ -102,6 +102,7 @@
     <ClCompile Include="flecha.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="InfoBar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MobileObject.cpp" />
     <ClCompile Include="rectangle.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="flecha.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="InfoBar.h" />
     <ClInclude Include="MobileObject.h" />
     <ClInclude Include="rectangle.h" />
     <ClInclude Include="SceneObject.h" />

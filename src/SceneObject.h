@@ -5,8 +5,12 @@
 
 #pragma once
 #include "GameObject.h"
+#include <iostream>
+#include <string>
 #include "rectangle.h"
 #include "texture.h"
+
+using namespace std;
 
 class Game;
 
@@ -26,6 +30,8 @@ protected:
 
 	float height; // Alto del objeto.
 
+	SceneObject(Game* game, Texture* myTexture, istream& juegoGuardado);
+
 	SceneObject(Game* myGame, Texture* myTexture, Point2D<float> myPos, float myWidht, float myHeight, int anim = 0) :
 		GameObject(myGame),
 		text(myTexture),
@@ -36,6 +42,7 @@ protected:
 	{
 	};
 
+
 public:
 
 	~SceneObject() {
@@ -45,5 +52,7 @@ public:
 	void render() const override; // Renderiza un objeto en función de su rectángulo pos, con la textura text.
 
 	virtual bool hit(const Rectangle&); // Devuelve true si hay colisión con el rectángulo pasado como parámetro.
+
+	virtual void saveObj(ostream&);
 
 };
