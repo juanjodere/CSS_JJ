@@ -9,6 +9,7 @@
 
 #include "texture.h"
 #include "Balloon.h"
+#include "butterfly.h"
 
 using namespace std;
 
@@ -39,6 +40,7 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 	TextureSpec{"bow.png", 1, 2},
 	{"balloons.png", 7, 6},
 	{"arrow.png",1,1},
+	{"butterfly.png",4,10},
 };
 
 // Guardan unidades de tiempo:
@@ -186,15 +188,13 @@ Game::run()
 		startTime = SDL_GetTicks(); // Momento en el que inicia
 
 		handleEvents();
-		//if (!partidaCargada) {
-			update(FRAME_PERIOD);
-			render();
-			partidaCargada = false;
-		//}
+		update(FRAME_PERIOD);
+		render();
+		
 		frameTime = SDL_GetTicks() - startTime; // Actualiza el tiempo actual.
 		if (frameTime < FRAME_PERIOD) // Fuerza que el bucle empiece cada FRAME_PERIOD
 			SDL_Delay(FRAME_PERIOD - frameTime);
-		
+
 	}
 }
 
@@ -218,7 +218,6 @@ Game::handleEvents()
 			}
 			else if (keys[SDL_SCANCODE_O]) {
 				openGame();
-				partidaCargada = true;
 			}
 		}
 	}
@@ -235,14 +234,24 @@ Game::createBalloon(Point2D<float> origin)
 
 	objects.push_back(new Balloon(this, getTexture(BALLOON), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
 }
+/*void
+Game::createButterfly(Point2D<float> origin)
+{	// Aleatoriza el color (fila de la textura), velocidad y posición del globo.
+	int color = uniform_int_distribution<int>(0, 6)(randomGenerator);
+	float speedVar = uniform_real_distribution<float>(0.05, 0.5)(randomGenerator);
+	float posVar = uniform_real_distribution<float>(-100, 325)(randomGenerator);
+	Point2D<float> pos = { origin.getX() + posVar, origin.getY() };
+
+	objects.push_back(new butterfly(this, getTexture(BUTTERFLY), pos, BALLOON_WIDTH, BALLOON_HEIGHT, { 0, -speedVar }, color)); // Lo crea y mete al vector.
+}*/
 
 // Crea una flecha y la mete al vector de flechas.
 void
 Game::createArrow(Point2D<float> reltvOrigin, Point2D<float> bowPos) {
 
-	cout << "flecha";
+	//cout << "flecha";
 	objects.push_back( new flecha(this, getTexture(ARROW), bowPos + reltvOrigin, ARROW_WIDTH, ARROW_HEIGHT, {1, 0} ));
-	cout << "flechaFin";
+	//cout << "flechaFin";
 
 }
 
@@ -285,7 +294,7 @@ void Game::saveGame() {
 		}
 	}
 	juego.close(); // Cierra el archivo.
-	std::cout << "save";
+	//std::cout << "save";
 }
 void Game::openGame() {
 	ifstream juego;
@@ -293,14 +302,11 @@ void Game::openGame() {
 
 	if (!juego.is_open())throw string("ERROR: No se ha encontrado una partida guardada."); // Excepción
 	else {
-		
-		for (size_t i = 0; i < objects.size(); ++i) { // Borra los objetos que existiesen.
-			delete objects[i];
-			objects[i] = nullptr;
-		}
+
+		objects.clear();
 
 		char clave = juego.get();
-			std::cout << clave;
+		//std::cout << clave;
 
 		if (clave == 'N') {
 			juego.get();
@@ -309,39 +315,42 @@ void Game::openGame() {
 			{
 				clave = juego.get();
 				nivel += clave;
-				std::cout << clave;
+				//std::cout << clave;
 			}
 			Nivel = stoi(nivel);
 		}
-		std::cout << clave;
+		//std::cout << clave;
 		clave = juego.get();
-		std::cout << clave;
+		//std::cout << clave;
 		if (clave == 'P') {
 			juego.get();
 			string pts;
-			while (clave != ' ')
+			while (clave != ' ' && clave != '\n')
 			{
 				clave = juego.get();
 				pts += clave;
 			}
 			points = stoi(pts);
-			std::cout << pts;
+			//std::cout << pts;
 		}
-		juego.ignore('\n'); // Si no se sabe qué pone, se ignora la línea entera. 
 		
-			std::cout << clave;
+			//std::cout << clave;
 		while (!juego.fail()) { // Mientras siga abierto.
 			clave = juego.get();
 			if (clave == 'B') {
 				objects.push_back(new Balloon(this, getTexture(BALLOON), juego));
+				//std::cout << " Bya ";
 			}
 			else if(clave == 'F') {
 				objects.push_back(new flecha(this, getTexture(ARROW), juego));
 			}
-			else juego.ignore('\n'); // Si no se sabe qué pone, se ignora la línea entera.
+			else if (clave == 'M') {
+				//objects.push_back(new butterfly(this, getTexture(BUTTERFLY), juego));
+			}
+			else juego.get(); // Si no se sabe qué pone, se ignora la línea entera.
 		}
 	}
 
 	juego.close(); // Cierra el archivo.
-	std::cout << "open";
+	//std::cout << "open";
 }

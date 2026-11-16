@@ -13,6 +13,7 @@
 #include "vector2D.h"
 #include "rectangle.h"
 #include "Balloon.h"
+//#include "butterfly.h"
 #include "Arco.h"
 #include "flecha.h"
 
@@ -23,6 +24,7 @@ class Texture;
 class flecha;
 class Arco;
 class Balloon;
+class butterfly;
 
 
 class Game
@@ -41,6 +43,7 @@ public:
 		BOW = 0,
 		BALLOON, 
 		ARROW,
+		BUTTERFLY,
 		NUM_TEXTURES
 	};
 
@@ -53,6 +56,7 @@ private:
 	void update(float dt);
 	void handleEvents();
 	void createBalloon(Point2D<float> origin);
+	void createButterfly(Point2D<float> origin);
 
 	bool exit;
 

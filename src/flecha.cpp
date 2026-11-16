@@ -5,7 +5,7 @@
 
 flecha::flecha(Game* game, Texture* myTexture, istream& juegoGuardado) : MobileObject(game, myTexture, juegoGuardado) {
 
-	cout << "Const flecha istream";
+	//cout << "Const flecha istream";
 };
 // Los punteros con memoria en el heap los iguala a null, sin borrarlos, ya que el game ya los 
 // borrará en su destructor.
@@ -28,5 +28,5 @@ bool flecha::update(float dt) {
 void flecha::saveObj(ostream& archivo) {
 	archivo << "F";
 	MobileObject::saveObj(archivo);
-	archivo << "\n";
+	archivo << " \n";
 }
