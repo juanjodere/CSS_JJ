@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <string>
 #include "vector2D.h"
 #include "rectangle.h"
 #include "Balloon.h"
@@ -60,6 +61,7 @@ private:
 	void handleEvents();
 	void createBalloon(Point2D<float> origin);
 	void createButterfly(Point2D<float> origin);
+	void initButterfly();
 
 	bool exit;
 

@@ -3,10 +3,6 @@
 #include "flecha.h"
 #include "game.h"
 
-flecha::flecha(Game* game, Texture* myTexture, istream& juegoGuardado) : MobileObject(game, myTexture, juegoGuardado) {
-
-	//cout << "Const flecha istream";
-};
 // Los punteros con memoria en el heap los iguala a null, sin borrarlos, ya que el game ya los 
 // borrará en su destructor.
 flecha::~flecha() {
@@ -17,6 +13,7 @@ flecha::~flecha() {
 // Se mueve, y comprueba si ha habido colisión con algún globo.
 // Si ha salido de la ventana, devuelve false para que el Game lo destruya.
 bool flecha::update(float dt) {
+	//cout << "pasando";
 	MobileObject::update(dt);
 	float tip_width = pos.getWidth() / 4; // Colisión de la punta de la flecha.
 	_game->checkCollison(Rectangle({tip_width * 3 + pos.getTopLeftCorner().getX(), pos.getTopLeftCorner().getY()}, tip_width, pos.getHeight())); // Envia rectángulo de la punta de flecha a ver si colisiona.
@@ -26,7 +23,7 @@ bool flecha::update(float dt) {
 
 }
 void flecha::saveObj(ostream& archivo) {
-	archivo << "F";
+	archivo << "A";
 	MobileObject::saveObj(archivo);
-	archivo << " \n";
+	archivo << "\n";
 }

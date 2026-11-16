@@ -63,6 +63,7 @@ int ballTimeCount = 0;
 int numButterflies = 0;
 
 bool partidaCargada = false;
+bool btf = false;
 
 // Cambia variables del game y otros elementos en base a un archivo en la carpeta LEVEL_ROOT.
 // Relanza excepciones en caso de capturar alguna.
@@ -75,13 +76,19 @@ void Game::LoadLevel(const string& entrada) {
 		string clave = " ";
 		while (!guardado.fail()) { // Mientras siga abierto.
 			guardado >> clave;
+			//cout << clave;
 			if (clave[0] == '#') guardado.ignore('\n'); // Si es un comentario, ignora la línea.
-			else if (clave == "baldelay") guardado >> baldelay; // lee baldelay.
+			else if (clave == "bgcolor") {} // lee número de flechas.
 			else if (clave == "arrows") { // lee número de flechas.
 				int na = 0;
 				guardado >> na;
 				Jugador->setNumArrows(na);
+				//guardado.ignore('\n');
 			}
+			else if (clave == "baldelay") guardado >> baldelay; // lee baldelay.
+			else if (clave == "balpoints") ; // lee baldelay
+			else if (clave == "balspeed"); // lee baldelay.
+			else if (clave == "balgoal"); // lee baldelay.
 			else if (clave == "butterflies") {
 				guardado >> numButterflies;
 			}
@@ -126,7 +133,7 @@ Game::Game()
 	}
 	// Crear los objetos del juego
 	Jugador = new Arco(this, getTexture(BOW), { 0,250 }, BOW_WIDTH, BOW_HEIGHT, {0, 0.5});
-
+	
 	for (int i = 0; i < numButterflies; ++i) {
 		Point2D<float> pos = { uniform_real_distribution<float>(100,100)(randomGenerator), uniform_real_distribution<float>(100, 100)(randomGenerator) };
 		createButterfly(pos);
@@ -162,7 +169,7 @@ Game::render() const
 
 	Jugador->render(); // Renderiza el jugador.
 
-	for (int i = 0; i < objects.size(); ++i) { // Renderiza globos.
+	for (int i = 0; i < objects.size(); ++i) {
 		objects[i]->render();
 	}
 
@@ -198,6 +205,8 @@ Game::run()
 {
 	while (!exit) {
 		startTime = SDL_GetTicks(); // Momento en el que inicia
+
+		initButterfly();
 
 		handleEvents();
 		update(FRAME_PERIOD);
@@ -241,7 +250,18 @@ Game::createButterfly(Point2D<float> origin) {
 	Vector2D<float> vel = {float( uniform_int_distribution<int>(-1, 0)(randomGenerator) ) , float ( uniform_int_distribution<int>(-1, 0)(randomGenerator) )};
 	if (vel.getX() == 0) vel = { 1, vel.getY() }; if (vel.getY() == 0) vel = { vel.getX(), 1 };
 
-	objects.push_back(new butterfly(this, getTexture(BUTTERFLY), origin, BUTTERFLY_WIDTH, BUTTERFLY_HEIGHT, { BUTTERFLY_VEL * vel.getX(), BUTTERFLY_VEL * vel.getY() }));
+	objects.push_back(new butterfly(this, getTexture(BUTTERFLY), origin, BUTTERFLY_WIDTH, BUTTERFLY_HEIGHT, { BUTTERFLY_VEL * vel.getX(), BUTTERFLY_VEL * vel.getY() }, 0));
+}
+// Crea una mariposa y la mete al array de objetos.
+void
+Game::initButterfly() {
+	if (!btf) {
+		for (int i = 0; i < numButterflies; ++i) {
+			Point2D<float> pos = { uniform_real_distribution<float>(100,700)(randomGenerator), uniform_real_distribution<float>(100, 500)(randomGenerator) };
+			createButterfly(pos);
+		}
+		btf = true;
+	}
 }
 
 // Crea un globo, con coordenada en x, color y velocidad aleatoria.
@@ -366,13 +386,13 @@ Game::openGame() {
 					objects.push_back(new Balloon(this, getTexture(BALLOON), juego));
 					//std::cout << " Bya ";
 				}
-				else if (clave == 'F') {
+				else if (clave == 'A') {
 					objects.push_back(new flecha(this, getTexture(ARROW), juego));
 				}
 				else if (clave == 'M') {
-					//objects.push_back(new butterfly(this, getTexture(BUTTERFLY), juego));
+					objects.push_back(new butterfly(this, getTexture(BUTTERFLY), juego));
 				}
-				else juego.get(); // Si no se sabe qué pone, se ignora la línea entera.
+				else juego.get();
 			}
 		}
 		catch(GameError error){

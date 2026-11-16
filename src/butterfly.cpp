@@ -10,7 +10,7 @@ butterfly::butterfly(Game* game, Texture* myTexture, istream& juegoGuardado) : M
 	char clave = juegoGuardado.get();
 	string a;
 	//cout << clave;
-	while (clave != ' ')
+	while (clave != ' ' && clave != '\n')
 	{
 		//cout << clave;
 		a += clave;
@@ -31,7 +31,6 @@ bool butterfly::update(float dt) {
 		manageMovement(dt);
 
 	}
-
 	return true;
 
 }

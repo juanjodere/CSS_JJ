@@ -6,3 +6,5 @@ balpoints 10
 balspeed 0.2
 goal 100
 butterflies 4
+
+noData

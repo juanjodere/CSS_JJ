@@ -18,7 +18,7 @@ public:
 		MobileObject(myGame, myTexture, myPos, myWidht, myHeight, myVel)
 	{};
 
-	flecha(Game * game, Texture * myTexture, istream & juegoGuardado);
+	flecha(Game* game, Texture* myTexture, istream& juegoGuardado) : MobileObject(game, myTexture, juegoGuardado) { SceneObject::render(); };
 
 	~flecha();
 

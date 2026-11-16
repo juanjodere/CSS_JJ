@@ -15,7 +15,7 @@ SceneObject::SceneObject(Game* game, Texture* myTexture, istream& juego): GameOb
 	while (clave != ' ')
 	{
 		x_str += clave;
-		cout << clave;
+		//cout << clave;
 		clave = juego.get();
 	}
 	string y_str;
@@ -39,7 +39,7 @@ SceneObject::SceneObject(Game* game, Texture* myTexture, istream& juego): GameOb
 	string h;
 	clave = juego.get();
 	//cout << clave;
-	while (clave != ' ')
+	while (clave != ' ' && clave != '\n')
 	{
 		h += clave;
 		clave = juego.get();
@@ -69,6 +69,6 @@ bool SceneObject::hit(const Rectangle& collisioner) {
 	return pos.hasIntersection(collisioner);
 }
 void SceneObject::saveObj(ostream& archivo) {
-	archivo << " " << floor(pos.getTopLeftCorner().getX()) << " " << floor(pos.getTopLeftCorner().getY());
+	archivo << " " << pos.getTopLeftCorner().getX() << " " << pos.getTopLeftCorner().getY();
 	archivo << " " << width << " " << height << " ";
 }
